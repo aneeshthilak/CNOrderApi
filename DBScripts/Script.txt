@@ -1,0 +1,19 @@
+﻿CREATE PROCEDURE [dbo].[GetCustomerOrder]( 
+	@CustomerID int
+) AS
+BEGIN
+
+	SELECT cust.FirstName, cust.LastName, cust.HouseNo, cust.Street, cust.Town, cust.PostCode,
+		ord.OrderId, ord.OrderDate, ord.DeliveryExpected,
+		orddtl.Quantity, orddtl.Price, 
+		CASE WHEN ord.CONTAINSGIFT = 1 THEN 'Gift' 
+		ELSE prod.ProductName END AS ProductName
+    From [dbo].[ORDERS] ord
+	inner join [dbo].[ORDERITEMS] orddtl On orddtl.OrderId = ord.OrderId
+	right join [dbo].[CUSTOMERS] cust on  cust.CustomerId = ord.CustomerId
+	inner join [dbo].[PRODUCTS] prod on orddtl.PRODUCTID = prod.PRODUCTID
+	where cust.CustomerId = @CustomerID;
+
+	--Select * from [dbo].[CUSTOMERS] where CustomerId = @CustomerID;
+
+END
