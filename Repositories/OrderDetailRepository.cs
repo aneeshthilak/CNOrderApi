@@ -82,7 +82,7 @@ namespace CNOrderApi.Repositories
         /// A sample method for getting all customers
         /// </summary>
         /// <returns></returns>
-        public async Task<IEnumerable<Customer>> GetCustomer()
+        public async Task<List<Customer>> GetCustomer()
         {
             var query = "SELECT * FROM Customers";
             using (var connection = _context.CreateConnection())

@@ -20,9 +20,6 @@ namespace CNOrderApi.Controllers
             _configuration = configuration;
         }
 
-
-
-
         private string getCustomerSP = "[dbo].[GetCustomers]";
 
         [HttpGet("GetCustomer")]
@@ -35,7 +32,6 @@ namespace CNOrderApi.Controllers
             }
         }
 
-
         [HttpGet("GetCustomer1")]
         public async Task<Customer> GetCustomer1(int id)
         {
@@ -44,9 +40,6 @@ namespace CNOrderApi.Controllers
                 var procedure = "GetCustomers";
                 var parameters = new DynamicParameters();
                 parameters.Add("@CustomerID", id);
-                //queryParameters.Add("@parameter2", valueOfparameter2);
-
-                //var parameters = new DynamicParameters(new { CustomerID = id });
                 var results = await connection.QueryFirstAsync<Customer>(procedure, parameters, commandType: CommandType.StoredProcedure);
                 return results;
             }

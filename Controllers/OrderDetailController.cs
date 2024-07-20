@@ -2,9 +2,12 @@
 using CNOrderApi.Models;
 using CNOrderApi.Repositories;
 using Dapper;
+using Microsoft.AspNetCore.DataProtection.KeyManagement;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Data;
 using System.Data.SqlClient;
+using System.Net;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -25,18 +28,42 @@ namespace CNOrderApi.Controllers
         /// <param name="orderDetailRepo"></param>
         public OrderDetailController(IConfiguration configuration, IOrderDetailRepository orderDetailRepo)
         {
-            
+
             _OrderDetailRepo = orderDetailRepo;
             //_configuration = configuration;
         }
 
         [HttpPost]
         [Route("GetOrderDetail")]
-        public async Task<IActionResult> GetOrderDetail(int customerId)
+        public async Task<IActionResult> GetOrderDetail(CustomerInfo custInfo)
         {
             try
             {
-                var orderDetails = await _OrderDetailRepo.GetOrderDetail(customerId);
+                string emailId = string.Empty;
+                var httpContext = HttpContext;
+                //httpContext.Request.Headers..TryGetValue(UserContext, out var contextApiKey)
+                httpContext.Request.Headers.TryGetValue("UserEmail", out var contextEmail);
+                emailId = contextEmail;
+
+                if (contextEmail.Equals(string.Empty))
+                {
+                    return StatusCode(401, "Request header not contains email Id");
+                }
+                if (custInfo.UserEmail != emailId)
+                {
+                    return StatusCode(401, "Customer is not the logged in user");
+                }
+
+                List<Customer> customerList = _OrderDetailRepo.GetCustomer().Result;
+
+                Customer customer = customerList.Find(item => item.Email == emailId);
+
+                if (customer == null)
+                {
+                    return StatusCode(401, "Customer not found with this email id");
+                }
+                var orderDetails = await _OrderDetailRepo.GetOrderDetail(customer.CustomerId);
+
                 return Ok(orderDetails);
             }
             catch (Exception ex)
@@ -53,6 +80,7 @@ namespace CNOrderApi.Controllers
         {
             try
             {
+
                 var orderDetails = await _OrderDetailRepo.GetCustomerOrder(customerId);
                 return Ok(orderDetails);
             }
@@ -102,48 +130,7 @@ namespace CNOrderApi.Controllers
         //}
 
 
-        //// POST api/<ProductController>
-        //[HttpPost]
-        //[Route("GetOrderDetail")]
-        //public async Task<IActionResult> GetOrderDetail(CustomerInfo customerInfo)
-        //{
-        //    List<Products> products = new List<Products>();
-        //    SqlConnection connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection"));
-        //    SqlCommand cmd;
-        //    //SqlCommand cmd = new SqlCommand("select * from Products", connection);
-        //    DataTable dt = new DataTable();
-        //    SqlDataAdapter da;
-        //    try
-        //    {
-        //        cmd = new SqlCommand("GetCustomerOrder", connection);
-        //        cmd.CommandType = CommandType.StoredProcedure;
-        //        cmd.Parameters.AddWithValue("@CustomerID", customerInfo.CustomerId);
-        //        da = new SqlDataAdapter(cmd);
-        //        da.Fill(dt);
-        //        //SqlConnection connection = new SqlConnection(this.Configuration.GetConnectionString("DefaultConnection"));
-        //        //SqlCommand cmd = new SqlCommand("insert into Products (ProductName, Colour, Size) values('" + product.ProductName + "','" + product.Colour + "','" + product.Size + "')", connection);
-        //        //connection.Open();
-        //        //cmd.ExecuteNonQuery();
-        //        //connection.Close();
-        //        for (int i = 0; i < dt.Rows.Count; i++)
-        //        {
-        //            Products prod = new Products();
-        //            prod.ProductId = int.Parse(dt.Rows[i]["ProductID"].ToString());
-        //            prod.ProductName = dt.Rows[i]["ProductName"].ToString();
-        //            prod.Colour = dt.Rows[i]["Colour"].ToString();
-        //            prod.Size = dt.Rows[i]["Size"].ToString();
 
-        //            products.Add(prod);
-
-        //        }
-        //    }
-        //    catch
-        //    {
-
-        //    }
-
-        //    return Ok(products);
-        //}
 
 
 

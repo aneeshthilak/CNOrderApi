@@ -2,6 +2,7 @@ using CNOrderApi.Data;
 using CNOrderApi.Models;
 using CNOrderApi.Interfaces;
 using CNOrderApi.Repositories;
+using CNOrderApi.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,6 +28,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+//Middleware to validate authenticated user - assume if authenticated user in header user email will be there
+//app.UseMiddleware<AuthenticationValidator>();
 
 app.UseAuthorization();
 
