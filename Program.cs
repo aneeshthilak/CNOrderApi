@@ -11,9 +11,9 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddScoped<IDapperRepository, DapperRepository>();
-builder.Services.AddSingleton<DapperContext>();
+//builder.Services.AddScoped<IDapperRepository, DapperRepository>();
 builder.Services.AddScoped<IOrderDetailRepository, OrderDetailRepository>();
+builder.Services.AddSingleton<DapperContext>();
 builder.Services.AddControllers();
 
 

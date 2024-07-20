@@ -1,5 +1,6 @@
 ﻿using CNOrderApi.Interfaces;
 using CNOrderApi.Models;
+using CNOrderApi.Repositories;
 using Dapper;
 using Microsoft.AspNetCore.Mvc;
 using System.Data;
@@ -14,15 +15,55 @@ namespace CNOrderApi.Controllers
     public class OrderDetailController : ControllerBase
     {
 
-        private IConfiguration _configuration;
-
+        //private IConfiguration _configuration;
         private readonly IOrderDetailRepository _OrderDetailRepo;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="configuration"></param>
+        /// <param name="orderDetailRepo"></param>
         public OrderDetailController(IConfiguration configuration, IOrderDetailRepository orderDetailRepo)
         {
-            _configuration = configuration;
+            
             _OrderDetailRepo = orderDetailRepo;
+            //_configuration = configuration;
         }
+
+        [HttpPost]
+        [Route("GetOrderDetail")]
+        public async Task<IActionResult> GetOrderDetail(int customerId)
+        {
+            try
+            {
+                var orderDetails = await _OrderDetailRepo.GetOrderDetail(customerId);
+                return Ok(orderDetails);
+            }
+            catch (Exception ex)
+            {
+                //log error
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+
+        [HttpPost]
+        [Route("GetCoustmerOrder")]
+        public async Task<IActionResult> GetCoustmerOrder(int customerId)
+        {
+            try
+            {
+                var orderDetails = await _OrderDetailRepo.GetCustomerOrder(customerId);
+                return Ok(orderDetails);
+            }
+            catch (Exception ex)
+            {
+                //log error
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+
 
         [HttpGet]
         [Route("GetCustomer")]
@@ -39,7 +80,6 @@ namespace CNOrderApi.Controllers
                 return StatusCode(500, ex.Message);
             }
         }
-
 
         //// POST api/<OrderDetailController>
         //[HttpPost]
@@ -61,88 +101,51 @@ namespace CNOrderApi.Controllers
 
         //}
 
-        //public async Task<IActionResult> GetEmployee(int id)
-        //{
-        //    var result = await _employeeService.GetEmployee(id);
 
-        //    return Ok(result);
+        //// POST api/<ProductController>
+        //[HttpPost]
+        //[Route("GetOrderDetail")]
+        //public async Task<IActionResult> GetOrderDetail(CustomerInfo customerInfo)
+        //{
+        //    List<Products> products = new List<Products>();
+        //    SqlConnection connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection"));
+        //    SqlCommand cmd;
+        //    //SqlCommand cmd = new SqlCommand("select * from Products", connection);
+        //    DataTable dt = new DataTable();
+        //    SqlDataAdapter da;
+        //    try
+        //    {
+        //        cmd = new SqlCommand("GetCustomerOrder", connection);
+        //        cmd.CommandType = CommandType.StoredProcedure;
+        //        cmd.Parameters.AddWithValue("@CustomerID", customerInfo.CustomerId);
+        //        da = new SqlDataAdapter(cmd);
+        //        da.Fill(dt);
+        //        //SqlConnection connection = new SqlConnection(this.Configuration.GetConnectionString("DefaultConnection"));
+        //        //SqlCommand cmd = new SqlCommand("insert into Products (ProductName, Colour, Size) values('" + product.ProductName + "','" + product.Colour + "','" + product.Size + "')", connection);
+        //        //connection.Open();
+        //        //cmd.ExecuteNonQuery();
+        //        //connection.Close();
+        //        for (int i = 0; i < dt.Rows.Count; i++)
+        //        {
+        //            Products prod = new Products();
+        //            prod.ProductId = int.Parse(dt.Rows[i]["ProductID"].ToString());
+        //            prod.ProductName = dt.Rows[i]["ProductName"].ToString();
+        //            prod.Colour = dt.Rows[i]["Colour"].ToString();
+        //            prod.Size = dt.Rows[i]["Size"].ToString();
+
+        //            products.Add(prod);
+
+        //        }
+        //    }
+        //    catch
+        //    {
+
+        //    }
+
+        //    return Ok(products);
         //}
 
 
-        // POST api/<ProductController>
-        [HttpPost]
-        [Route("GetOrderDetail")]
-        public async Task<IActionResult> GetOrderDetail(CustomerInfo customerInfo)
-        {
-            List<Products> products = new List<Products>();
-            SqlConnection connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection"));
-            SqlCommand cmd;
-            //SqlCommand cmd = new SqlCommand("select * from Products", connection);
-            DataTable dt = new DataTable();
-            SqlDataAdapter da;
-            try
-            {
-                cmd = new SqlCommand("GetCustomerOrder", connection);
-                cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.AddWithValue("@CustomerID", customerInfo.CustomerId);
-                da = new SqlDataAdapter(cmd);
-                da.Fill(dt);
-                //SqlConnection connection = new SqlConnection(this.Configuration.GetConnectionString("DefaultConnection"));
-                //SqlCommand cmd = new SqlCommand("insert into Products (ProductName, Colour, Size) values('" + product.ProductName + "','" + product.Colour + "','" + product.Size + "')", connection);
-                //connection.Open();
-                //cmd.ExecuteNonQuery();
-                //connection.Close();
-                for (int i = 0; i < dt.Rows.Count; i++)
-                {
-                    Products prod = new Products();
-                    prod.ProductId = int.Parse(dt.Rows[i]["ProductID"].ToString());
-                    prod.ProductName = dt.Rows[i]["ProductName"].ToString();
-                    prod.Colour = dt.Rows[i]["Colour"].ToString();
-                    prod.Size = dt.Rows[i]["Size"].ToString();
 
-                    products.Add(prod);
-
-                }
-            }
-            catch
-            {
-
-            }
-
-            return Ok(products);
-        }
-
-
-        // GET: api/<OrderDetailController>
-        [HttpGet]
-        public IEnumerable<string> Get()
-        {
-            return new string[] { "value1", "value2" };
-        }
-
-        // GET api/<OrderDetailController>/5
-        [HttpGet("{id}")]
-        public string Get(int id)
-        {
-            return "value";
-        }
-
-        // POST api/<OrderDetailController>
-        [HttpPost]
-        public void Post([FromBody] string value)
-        {
-        }
-
-        // PUT api/<OrderDetailController>/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
-        {
-        }
-
-        // DELETE api/<OrderDetailController>/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
-        }
     }
 }
